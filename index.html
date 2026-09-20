@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEDDINGLY - Plateforme de Mariage</title>
+    <script defer src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500&display=swap');
+        
+        * { font-family: 'Lora', serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Playfair Display', serif; }
+        
+        .gradient-pink { background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%); }
+        .text-pink-luxury { color: #d946a6; }
+        .border-pink-luxury { border-color: #f472b6; }
+        .bg-pink-luxury { background-color: #fdf2f8; }
+        .btn-primary { @apply px-6 py-3 bg-pink-500 text-white rounded-lg font-semibold hover:bg-pink-600 transition; }
+        .card-shadow { box-shadow: 0 4px 15px rgba(217, 70, 166, 0.1); }
+    </style>
+</head>
+<body class="bg-white">
+    <div x-data="weddingly()" class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="sticky top-0 z-50 bg-white border-b border-pink-100 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                <div class="text-2xl font-bold text-pink-luxury">💍 WEDDINGLY</div>
+                <div class="flex gap-4">
+                    <button @click="currentPage = 'home'" :class="{'text-pink-luxury font-semibold': currentPage === 'home'}" class="px-4 py-2 transition">Accueil</button>
+                    <button @click="currentPage = 'dashboard'" :class="{'text-pink-luxury font-semibold': currentPage === 'dashboard'}" class="px-4 py-2 transition" x-show="isLoggedIn">Dashboard</button>
+                    <button @click="isLoggedIn ? logout() : (currentPage = 'login')" class="btn-primary">
+                        <span x-show="!isLoggedIn">Connexion</span>
+                        <span x-show="isLoggedIn">Déconnexion</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- PAGE: HOME -->
+        <div x-show="currentPage === 'home'" class="min-h-screen">
+            <!-- Hero -->
+            <section class="gradient-pink py-20">
+                <div class="max-w-6xl mx-auto px-4 text-center">
+                    <h1 class="text-5xl md:text-6xl font-bold text-pink-luxury mb-6">Votre Mariage, Simplifié</h1>
+                    <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">Gérez vos invitations, RSVPs, photos et détails de mariage sur une plateforme élégante et intuitive.</p>
+                    <button @click="currentPage = 'register'" class="btn-primary text-lg">Commencer Maintenant</button>
+                </div>
+            </section>
+
+            <!-- Features -->
+            <section class="max-w-6xl mx-auto px-4 py-20">
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="p-8 bg-pink-luxury rounded-xl card-shadow text-center">
+                        <div class="text-4xl mb-4">📧</div>
+                        <h3 class="text-2xl font-bold text-pink-luxury mb-4">Invitations</h3>
+                        <p class="text-gray-700">Créez et envoyez des invitations élégantes à vos proches.</p>
+                    </div>
+                    <div class="p-8 bg-pink-luxury rounded-xl card-shadow text-center">
+                        <div class="text-4xl mb-4">✓</div>
+                        <h3 class="text-2xl font-bold text-pink-luxury mb-4">RSVP</h3>
+                        <p class="text-gray-700">Collectez les confirmations de présence automatiquement.</p>
+                    </div>
+                    <div class="p-8 bg-pink-luxury rounded-xl card-shadow text-center">
+                        <div class="text-4xl mb-4">📸</div>
+                        <h3 class="text-2xl font-bold text-pink-luxury mb-4">Galerie</h3>
+                        <p class="text-gray-700">Partagez et organisez les photos du mariage.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- PAGE: LOGIN -->
+        <div x-show="currentPage === 'login'" class="min-h-screen flex items-center justify-center bg-gray-50">
+            <div class="bg-white p-10 rounded-xl card-shadow max-w-md w-full">
+                <h2 class="text-3xl font-bold text-pink-luxury mb-8">Connexion</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                        <input x-model="loginForm.email" type="email" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Mot de passe</label>
+                        <input x-model="loginForm.password" type="password" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <button @click="login()" class="btn-primary w-full">Se Connecter</button>
+                </div>
+                <p class="text-center mt-4 text-gray-600">Pas encore de compte ? 
+                    <button @click="currentPage = 'register'" class="text-pink-luxury font-semibold hover:underline">Inscrivez-vous</button>
+                </p>
+            </div>
+        </div>
+
+        <!-- PAGE: REGISTER -->
+        <div x-show="currentPage === 'register'" class="min-h-screen flex items-center justify-center bg-gray-50">
+            <div class="bg-white p-10 rounded-xl card-shadow max-w-md w-full">
+                <h2 class="text-3xl font-bold text-pink-luxury mb-8">Inscription</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nom Complet</label>
+                        <input x-model="registerForm.fullName" type="text" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                        <input x-model="registerForm.email" type="email" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Mot de passe</label>
+                        <input x-model="registerForm.password" type="password" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Date du Mariage</label>
+                        <input x-model="registerForm.weddingDate" type="date" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <button @click="register()" class="btn-primary w-full">Créer un Compte</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: DASHBOARD -->
+        <div x-show="currentPage === 'dashboard'" class="min-h-screen bg-gray-50 py-8">
+            <div class="max-w-6xl mx-auto px-4">
+                <h2 class="text-4xl font-bold text-pink-luxury mb-8">Dashboard</h2>
+
+                <!-- Tabs -->
+                <div class="flex gap-4 mb-8 border-b border-pink-100">
+                    <button @click="dashboardTab = 'overview'" :class="{'text-pink-luxury border-b-2 border-pink-luxury font-bold': dashboardTab === 'overview'}" class="pb-4 transition">Vue d'ensemble</button>
+                    <button @click="dashboardTab = 'wedding'" :class="{'text-pink-luxury border-b-2 border-pink-luxury font-bold': dashboardTab === 'wedding'}" class="pb-4 transition">Mon Mariage</button>
+                    <button @click="dashboardTab = 'guests'" :class="{'text-pink-luxury border-b-2 border-pink-luxury font-bold': dashboardTab === 'guests'}" class="pb-4 transition">Invités</button>
+                    <button @click="dashboardTab = 'photos'" :class="{'text-pink-luxury border-b-2 border-pink-luxury font-bold': dashboardTab === 'photos'}" class="pb-4 transition">Photos</button>
+                </div>
+
+                <!-- TAB: Overview -->
+                <div x-show="dashboardTab === 'overview'">
+                    <div class="grid md:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-xl card-shadow">
+                            <div class="text-sm text-gray-600">Invitations</div>
+                            <div class="text-3xl font-bold text-pink-luxury mt-2" x-text="weddings[0]?.guests?.length || 0"></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl card-shadow">
+                            <div class="text-sm text-gray-600">RSVPs Confirmés</div>
+                            <div class="text-3xl font-bold text-green-600 mt-2" x-text="(weddings[0]?.guests || []).filter(g => g.rsvpStatus === 'confirmed').length"></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl card-shadow">
+                            <div class="text-sm text-gray-600">En Attente</div>
+                            <div class="text-3xl font-bold text-yellow-600 mt-2" x-text="(weddings[0]?.guests || []).filter(g => g.rsvpStatus === 'pending').length"></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl card-shadow">
+                            <div class="text-sm text-gray-600">Photos Reçues</div>
+                            <div class="text-3xl font-bold text-blue-600 mt-2" x-text="weddings[0]?.photos?.length || 0"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: Wedding -->
+                <div x-show="dashboardTab === 'wedding'" class="bg-white p-8 rounded-xl card-shadow">
+                    <h3 class="text-2xl font-bold text-pink-luxury mb-6">Informations du Mariage</h3>
+                    <form @submit.prevent="updateWedding()" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Titre</label>
+                            <input x-model="weddings[0].title" type="text" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+                            <input x-model="weddings[0].date" type="date" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Lieu</label>
+                            <input x-model="weddings[0].location" type="text" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                            <textarea x-model="weddings[0].description" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500" rows="4"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">Enregistrer Modifications</button>
+                    </form>
+                </div>
+
+                <!-- TAB: Guests -->
+                <div x-show="dashboardTab === 'guests'">
+                    <div class="mb-6">
+                        <button @click="showAddGuest = !showAddGuest" class="btn-primary">+ Ajouter un Invité</button>
+                    </div>
+
+                    <div x-show="showAddGuest" class="bg-white p-6 rounded-xl card-shadow mb-6">
+                        <form @submit.prevent="addGuest()" class="space-y-4">
+                            <input x-model="newGuest.name" type="text" placeholder="Nom" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            <input x-model="newGuest.email" type="email" placeholder="Email" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            <input x-model="newGuest.phone" type="tel" placeholder="Téléphone" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            <select x-model="newGuest.group" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500">
+                                <option value="family">Famille</option>
+                                <option value="friends">Amis</option>
+                                <option value="colleagues">Collègues</option>
+                            </select>
+                            <button type="submit" class="btn-primary w-full">Ajouter</button>
+                        </form>
+                    </div>
+
+                    <div class="space-y-4">
+                        <template x-for="guest in weddings[0]?.guests || []" :key="guest.id">
+                            <div class="bg-white p-4 rounded-lg border border-pink-100 flex justify-between items-center">
+                                <div>
+                                    <div class="font-semibold text-gray-800" x-text="guest.name"></div>
+                                    <div class="text-sm text-gray-600" x-text="guest.email"></div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <span :class="{'bg-green-100 text-green-800': guest.rsvpStatus === 'confirmed', 'bg-yellow-100 text-yellow-800': guest.rsvpStatus === 'pending', 'bg-red-100 text-red-800': guest.rsvpStatus === 'declined'}" class="px-3 py-1 rounded-full text-sm font-semibold" x-text="guest.rsvpStatus === 'confirmed' ? 'Confirmé' : guest.rsvpStatus === 'pending' ? 'En attente' : 'Décliné'"></span>
+                                    <button @click="removeGuest(guest.id)" class="text-red-600 hover:text-red-800 font-semibold">Supprimer</button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- TAB: Photos -->
+                <div x-show="dashboardTab === 'photos'">
+                    <div class="mb-6">
+                        <label class="block">
+                            <span class="btn-primary cursor-pointer inline-block">📤 Télécharger une Photo</span>
+                            <input type="file" accept="image/*" multiple @change="uploadPhotos($event)" class="hidden">
+                        </label>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <template x-for="photo in weddings[0]?.photos || []" :key="photo.id">
+                            <div class="bg-white rounded-lg overflow-hidden card-shadow">
+                                <img :src="photo.url" :alt="photo.caption" class="w-full h-48 object-cover">
+                                <div class="p-4">
+                                    <p class="text-sm text-gray-700" x-text="photo.caption || 'Sans titre'"></p>
+                                    <button @click="removePhoto(photo.id)" class="text-red-600 text-sm font-semibold mt-2">Supprimer</button>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    <div x-show="!weddings[0]?.photos?.length" class="text-center text-gray-500 py-12">
+                        Aucune photo pour le moment
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function weddingly() {
+            return {
+                currentPage: 'home',
+                dashboardTab: 'overview',
+                isLoggedIn: false,
+                showAddGuest: false,
+                loginForm: { email: '', password: '' },
+                registerForm: { fullName: '', email: '', password: '', weddingDate: '' },
+                newGuest: { name: '', email: '', phone: '', group: 'family' },
+                currentUser: null,
+                weddings: [],
+
+                init() {
+                    this.loadFromStorage();
+                },
+
+                login() {
+                    const user = this.weddings.find(w => w.organizer.email === this.loginForm.email && w.organizer.password === this.loginForm.password);
+                    if (user) {
+                        this.isLoggedIn = true;
+                        this.currentUser = user.organizer;
+                        this.currentPage = 'dashboard';
+                        alert('Connexion réussie !');
+                    } else {
+                        alert('Email ou mot de passe incorrect');
+                    }
+                },
+
+                register() {
+                    if (!this.registerForm.fullName || !this.registerForm.email || !this.registerForm.password || !this.registerForm.weddingDate) {
+                        alert('Veuillez remplir tous les champs');
+                        return;
+                    }
+                    const wedding = {
+                        id: Date.now(),
+                        title: 'Mon Mariage',
+                        date: this.registerForm.weddingDate,
+                        location: '',
+                        description: '',
+                        organizer: {
+                            name: this.registerForm.fullName,
+                            email: this.registerForm.email,
+                            password: this.registerForm.password
+                        },
+                        guests: [],
+                        photos: [],
+                        createdAt: new Date().toISOString()
+                    };
+                    this.weddings.push(wedding);
+                    this.saveToStorage();
+                    this.isLoggedIn = true;
+                    this.currentUser = wedding.organizer;
+                    this.currentPage = 'dashboard';
+                    alert('Compte créé avec succès !');
+                },
+
+                logout() {
+                    this.isLoggedIn = false;
+                    this.currentUser = null;
+                    this.currentPage = 'home';
+                    this.loginForm = { email: '', password: '' };
+                },
+
+                updateWedding() {
+                    this.saveToStorage();
+                    alert('Mariage mis à jour avec succès !');
+                },
+
+                addGuest() {
+                    if (!this.newGuest.name || !this.newGuest.email) {
+                        alert('Veuillez remplir les champs obligatoires');
+                        return;
+                    }
+                    const guest = {
+                        id: Date.now(),
+                        ...this.newGuest,
+                        rsvpStatus: 'pending',
+                        addedAt: new Date().toISOString()
+                    };
+                    this.weddings[0].guests.push(guest);
+                    this.newGuest = { name: '', email: '', phone: '', group: 'family' };
+                    this.showAddGuest = false;
+                    this.saveToStorage();
+                    alert('Invité ajouté !');
+                },
+
+                removeGuest(id) {
+                    this.weddings[0].guests = this.weddings[0].guests.filter(g => g.id !== id);
+                    this.saveToStorage();
+                },
+
+                uploadPhotos(event) {
+                    const files = event.target.files;
+                    for (let file of files) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const photo = {
+                                id: Date.now() + Math.random(),
+                                url: e.target.result,
+                                caption: file.name,
+                                uploadedAt: new Date().toISOString()
+                            };
+                            this.weddings[0].photos.push(photo);
+                            this.saveToStorage();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                },
+
+                removePhoto(id) {
+                    this.weddings[0].photos = this.weddings[0].photos.filter(p => p.id !== id);
+                    this.saveToStorage();
+                },
+
+                saveToStorage() {
+                    localStorage.setItem('weddingly_data', JSON.stringify({ weddings: this.weddings, user: this.currentUser }));
+                },
+
+                loadFromStorage() {
+                    const data = JSON.parse(localStorage.getItem('weddingly_data') || '{}');
+                    this.weddings = data.weddings || [];
+                    if (data.user) {
+                        this.isLoggedIn = true;
+                        this.currentUser = data.user;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

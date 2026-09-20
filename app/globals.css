@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #fffdfd;
+  --foreground: #2d2a2b;
+  --muted: #f7f3f4;
+  --muted-foreground: #6f666a;
+  --card: #ffffff;
+  --border: #f3e7eb;
+  --primary: #d9829c;
+  --primary-foreground: #fff;
+  --secondary: #fff1f6;
+  --accent: #f7dfe7;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: linear-gradient(180deg, #fffdfd 0%, #fffafc 100%);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+}
+
+@layer components {
+  .container-shell {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .card-surface {
+    @apply rounded-2xl border border-rose-100 bg-white/90 shadow-soft;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-rose-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-200;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border border-rose-200 bg-white px-5 py-2.5 text-sm font-medium text-rose-700 transition hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-200;
+  }
+}
